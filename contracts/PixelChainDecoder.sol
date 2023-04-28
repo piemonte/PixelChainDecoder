@@ -3,6 +3,7 @@
 pragma solidity 0.8.18;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IPixelChain {
 
@@ -18,9 +19,7 @@ interface IPixelChain {
 }
 
 
-contract PixelChainDecoder {
-
-    IPixelChain public _pxc = IPixelChain(0xbc0E164eE423B7800e355b012c06446e28b1a29d);
+contract PixelChainDecoder is Ownable {
 
     struct Color {
         uint8 r;
@@ -33,6 +32,12 @@ contract PixelChainDecoder {
         uint256 y;
     }
 
+    IPixelChain public _pxc = IPixelChain(0xbc0E164eE423B7800e355b012c06446e28b1a29d);
+
+    function setPixelChainContract(address pxcAdress) public onlyOwner {
+        _pxc = IPixelChain(pxcAdress);
+    }
+
     function uintToHexDigit(uint256 value) internal pure returns (bytes1) {
         if (value < 10) {
             return bytes1(uint8(value) + uint8(bytes1('0')));
@@ -41,7 +46,7 @@ contract PixelChainDecoder {
         }
     }
 
-    function uint2str(uint256 value) internal pure returns (string memory) {
+    function uintToStr(uint256 value) internal pure returns (string memory) {
         if (value == 0) {
             return "0";
         }
@@ -118,7 +123,7 @@ contract PixelChainDecoder {
             string memory hexColor = toHexString(color.r, color.g, color.b);
             svgImage = string(abi.encodePacked(
                 svgImage,
-                '<rect x="', uint2str(cursor.x), '" y="', uint2str(cursor.y), '" width="1.5" height="1.5" fill="#', hexColor, '"/>'
+                '<rect x="', uintToStr(cursor.x), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', hexColor, '"/>'
             ));
             cursor.x++;
             if (cursor.x >= 32) {
