@@ -33,8 +33,6 @@ contract PixelChainDecoder {
         uint256 y;
     }
 
-    uint256 private constant IMAGE_SIZE = 32;
-
     function uintToHexDigit(uint256 value) internal pure returns (bytes1) {
         if (value < 10) {
             return bytes1(uint8(value) + uint8(bytes1('0')));
@@ -104,11 +102,13 @@ contract PixelChainDecoder {
         view
         returns (string memory)
     {
-        IPixelChain.PixelChain memory pxc = _pxc.pixelChains(tokenId);
+        require(tokenId < 2804); // v1 token limit
 
         string memory svgImage = string(abi.encodePacked(
-            '<svg xmlns="http://www.w3.org/2000/svg" width="', uint2str(IMAGE_SIZE), '" height="', uint2str(IMAGE_SIZE), '">'
+            '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">'
         ));
+
+        IPixelChain.PixelChain memory pxc = _pxc.pixelChains(tokenId);
 
         Color[] memory colors = paletteToColorRGBA(pxc.palette);
 
@@ -118,10 +118,10 @@ contract PixelChainDecoder {
             string memory hexColor = toHexString(color.r, color.g, color.b);
             svgImage = string(abi.encodePacked(
                 svgImage,
-                '<rect x="', uint2str(cursor.x), '" y="', uint2str(cursor.y), '" width="1" height="1" fill="#', hexColor, '"/>'
+                '<rect x="', uint2str(cursor.x), '" y="', uint2str(cursor.y), '" width="1.5" height="1.5" fill="#', hexColor, '"/>'
             ));
             cursor.x++;
-            if (cursor.x >= IMAGE_SIZE) {
+            if (cursor.x >= 32) {
                 cursor.x = 0;
                 cursor.y++;
             }

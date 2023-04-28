@@ -1,13 +1,12 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const pxc = "0xbc0E164eE423B7800e355b012c06446e28b1a29d";
-
-  const Decoder = await ethers.getContractFactory("Decoder");
+  const Decoder = await ethers.getContractFactory("PixelChainDecoder");
   const decoder = await Decoder.deploy();
 
   await decoder.deployed();
-  console.log("PixelChain Decoder deployed to:", decoder.address);
+
+  console.log("PixelChainDecoder deployed to:", decoder.address);
 }
 
 main().catch((error) => {
