@@ -3,8 +3,6 @@
 pragma solidity 0.8.18;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-
 
 interface IPixelChain {
 
@@ -20,7 +18,7 @@ interface IPixelChain {
 }
 
 
-contract PixelChainDecoder is Ownable {
+contract PixelChainDecoder {
 
     IPixelChain public _pxc = IPixelChain(0xbc0E164eE423B7800e355b012c06446e28b1a29d);
 
@@ -106,7 +104,7 @@ contract PixelChainDecoder is Ownable {
         }
     }
 
-    function paletteToColorRGBA(bytes memory palette) public pure returns (Color[] memory) {
+    function paletteToColorRGBA(bytes memory palette) internal pure returns (Color[] memory) {
         Color[] memory colors = new Color[](palette.length / 3);
         uint256 colorIndex = 0;
 
