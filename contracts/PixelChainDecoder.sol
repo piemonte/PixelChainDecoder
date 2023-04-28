@@ -102,24 +102,20 @@ contract PixelChainDecoder is Ownable {
         return colors;
     }
 
-    function generateSvgImage(uint256 tokenId)
-        external
-        view
+    function generateSvgImage(bytes memory imgData, bytes memory palette)
+        public
+        pure
         returns (string memory)
     {
-        require(tokenId < 2804); // v1 token limit
-
         string memory svgImage = string(abi.encodePacked(
             '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">'
         ));
 
-        IPixelChain.PixelChain memory pxc = _pxc.pixelChains(tokenId);
-
-        Color[] memory colors = paletteToColorRGBA(pxc.palette);
+        Color[] memory colors = paletteToColorRGBA(palette);
 
         Cursor memory cursor = Cursor(0, 0);
-        for (uint256 i = 0; i < pxc.data.length; i++) {
-            Color memory color = colors[uint8(pxc.data[i])];
+        for (uint256 i = 0; i < imgData.length; i++) {
+            Color memory color = colors[uint8(imgData[i])];
             string memory hexColor = toHexString(color.r, color.g, color.b);
             svgImage = string(abi.encodePacked(
                 svgImage,
@@ -138,6 +134,17 @@ contract PixelChainDecoder is Ownable {
         ));
 
         return svgImage;
+    }
+
+    function generatePixelChainImage(uint256 tokenId)
+        external
+        view
+        returns (string memory) {
+        require(tokenId < 2804); // v1 token limit
+        IPixelChain.PixelChain memory pxc = _pxc.pixelChains(tokenId);
+
+        string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
+        return  svgImage;
     }
     
 }
