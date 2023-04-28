@@ -8,7 +8,7 @@ Pixelchain is a decentralized app that allows anyone to create 32x32 pixelart an
 
 The original PixelChain contract (PixelChain "Classic") is now closed making the first 2,804 tokens a limited edition. Back in the day, it attracted a range of talented crypto artists: [@Coldie](https://twitter.com/coldie), [@money_alotta](https://twitter.com/money_alotta), [@hackatao](https://twitter.com/hackatao), [@mattiac](https://twitter.com/mattiac), [@neurocolor](https://twitter.com/neurocolor), [@robnessofficial](https://twitter.com/robnessofficial), [@XCOPYART](https://twitter.com/xcopyart) just to name a few.
 
-The great team behind PixelChain has moved on and is now focused on new projects, so I wanted to provide this code incase they would be helpful.
+The great team behind PixelChain has moved on and is now focused on new projects, so I provided this code to them incase they would find it helpful.
 
 ## Quick Start
 
