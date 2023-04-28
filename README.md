@@ -1,13 +1,17 @@
 # ⛓️ PixelChainDecoder (v1)
 
-This is an on-chain decoder for the PixelChain "Classic" collection.
+This is an on-chain decoder for the [PixelChain](https://pixelchain.art/) "Classic" collection.
+
+## What's PixelChain?
+
+Pixelchain is a decentralized app that allows anyone to create 32x32 pixelart and store it directly on the Ethereum blockchain, where it will live forever as an ERC-721 token. The original PixelChain contract (PixelChain "Classic") is now closed making the first 2,804 tokens a limited edition. When the contract was open, it attracted a range of talented crypto artists: [@Coldie](https://twitter.com/coldie), @money_alotta, @hackatao, @mattiac, @neurocolor, @robnessofficial, @XCOPYART just to name a few.
 
 ## Contracts
 
 | Contract           | Etherscan                                                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | PixelChainDecoder  | [0xdeadbeef](https://etherscan.io/address/0xdeadbeef#code)                                                                 |
-| PixelChain Classic | [0xbc0E164eE423B7800e355b012c06446e28b1a29d](https://etherscan.io/address/0xbc0E164eE423B7800e355b012c06446e28b1a29d#code) |
+| PixelChainCore     | [0xbc0E164eE423B7800e355b012c06446e28b1a29d](https://etherscan.io/address/0xbc0E164eE423B7800e355b012c06446e28b1a29d#code) |
 
 ## Resources
 
