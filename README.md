@@ -6,7 +6,7 @@ This is an on-chain decoder for the [PixelChain](https://pixelchain.art/) "Class
 
 Pixelchain is a decentralized app that allows anyone to create 32x32 pixelart and store it directly on the Ethereum blockchain, where it will live forever as an ERC-721 token.
 
-The original PixelChain contract (PixelChain "Classic") is now closed making the first 2,804 tokens a limited edition. Back in the day, it attracted a range of talented crypto artists: [@Coldie](https://twitter.com/coldie), [@money_alotta](https://twitter.com/money_alotta), [@hackatao](https://twitter.com/hackatao), [@mattiac](https://twitter.com/mattiac), [@neurocolor](https://twitter.com/neurocolor), [@robnessofficial](https://twitter.com/robnessofficial), [@XCOPYART](https://twitter.com/xcopyart) just to name a few.
+The original PixelChain contract (PixelChain "Classic") is now closed making the first [2,804 tokens](https://opensea.io/collection/pixelchain?search[stringTraits][0][name]=Version&search[stringTraits][0][values][0]=PixelChain&search[stringTraits][0][values][1]=PixelChain%20Classic) a limited edition. Back in the day, it attracted a range of talented crypto artists: [@Coldie](https://twitter.com/coldie), [@money_alotta](https://twitter.com/money_alotta), [@hackatao](https://twitter.com/hackatao), [@mattiac](https://twitter.com/mattiac), [@neurocolor](https://twitter.com/neurocolor), [@robnessofficial](https://twitter.com/robnessofficial), [@XCOPYART](https://twitter.com/xcopyart) just to name a few.
 
 The great team behind PixelChain has moved on and is now focused on new projects, so I provided this code to them incase they would find it helpful.
 
