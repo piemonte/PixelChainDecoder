@@ -35,29 +35,6 @@ contract PixelChainDecoder {
 
     uint256 private constant IMAGE_SIZE = 32;
 
-    function uintToHexString(uint a) internal pure returns (string memory) {
-        uint count = 0;
-        uint b = a;
-        while (b != 0) {
-            count++;
-            b /= 16;
-        }
-        bytes memory res = new bytes(count);
-        for (uint i=0; i<count; ++i) {
-            b = a % 16;
-            res[count - i - 1] = uintToHexDigit(uint8(b));
-            a /= 16;
-        }
-        
-        string memory str = string(res);
-        if (bytes(str).length == 0) {
-            return "00";
-        } else if (bytes(str).length == 1) {
-            return string(abi.encodePacked("0", str));
-        }
-        return str;
-    }
-
     function uintToHexDigit(uint256 value) internal pure returns (bytes1) {
         if (value < 10) {
             return bytes1(uint8(value) + uint8(bytes1('0')));
