@@ -58,12 +58,6 @@ interface IPixelChain {
 
 contract PixelChainDecoder is Ownable {
 
-    struct Color {
-        uint8 r;
-        uint8 g;
-        uint8 b;
-    }
-
     struct Cursor {
         uint256 x;
         uint256 y;
@@ -121,8 +115,8 @@ contract PixelChainDecoder is Ownable {
         }
     }
 
-    function paletteToColorRGBA(bytes memory palette) internal pure returns (Color[] memory) {
-        Color[] memory colors = new Color[](palette.length / 3);
+    function paletteToHexColors(bytes memory palette) internal pure returns (string[] memory) {
+        string[] memory colors = new string[](palette.length / 3);
         uint256 colorIndex = 0;
 
         for (uint256 i = 0; i < palette.length; i += 3) {
@@ -130,9 +124,7 @@ contract PixelChainDecoder is Ownable {
             uint8 g = uint8(palette[i + 1]);
             uint8 b = uint8(palette[i + 2]);
 
-            Color memory color = Color(r, g, b); // 255 alpha dropped for simplicity
-
-            colors[colorIndex] = color;
+            colors[colorIndex] = toHexString(r, g, b);
             colorIndex++;
         }
 
@@ -148,15 +140,10 @@ contract PixelChainDecoder is Ownable {
             '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">'
         ));
 
-        Color[] memory colors = paletteToColorRGBA(palette);
+        string[] memory colors = paletteToHexColors(palette);
         
-        Color memory color;
-        string memory hexColor;
         Cursor memory cursor = Cursor(0, 0);
         for (uint256 i = 0; i < imgData.length; i++) {
-            color = colors[uint8(imgData[i])];
-            hexColor = toHexString(color.r, color.g, color.b);
-
             svgImage = string(abi.encodePacked(
                 svgImage,
                 '<rect x="',
@@ -164,7 +151,7 @@ contract PixelChainDecoder is Ownable {
                 '" y="',
                 uintToStr(cursor.y),
                 '" width="1.5" height="1.5" fill="#',
-                hexColor,
+                colors[uint8(imgData[i])],
                 '"/>'
             ));
             cursor.x++;
@@ -181,6 +168,7 @@ contract PixelChainDecoder is Ownable {
 
         return svgImage;
     }
+
 
     function generatePixelChainImage(uint256 tokenId)
         external
