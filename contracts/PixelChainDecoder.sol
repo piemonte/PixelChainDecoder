@@ -71,8 +71,8 @@ contract PixelChainDecoder is Ownable {
 
     IPixelChain public _pxc = IPixelChain(0xbc0E164eE423B7800e355b012c06446e28b1a29d);
 
-    function setPixelChainContract(address pxcAdress) public onlyOwner {
-        _pxc = IPixelChain(pxcAdress);
+    function setPixelChainContract(address pxcAddress) public onlyOwner {
+        _pxc = IPixelChain(pxcAddress);
     }
 
     function uintToHexDigit(uint256 value) internal pure returns (bytes1) {
