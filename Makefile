@@ -10,4 +10,8 @@ deploy-local:
 	@echo [deploying localhost…]
 	@npx hardhat run scripts/deploy.ts --network localhost
 
-.PHONY: compile test deploy-local
+deploy-goerli:
+	@echo [deploying goerli…]
+	@npx hardhat run scripts/deploy.ts --network goerli
+
+.PHONY: compile test deploy-local deploy-goerli
