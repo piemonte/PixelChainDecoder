@@ -149,14 +149,23 @@ contract PixelChainDecoder is Ownable {
         ));
 
         Color[] memory colors = paletteToColorRGBA(palette);
-
+        
+        Color memory color;
+        string memory hexColor;
         Cursor memory cursor = Cursor(0, 0);
         for (uint256 i = 0; i < imgData.length; i++) {
-            Color memory color = colors[uint8(imgData[i])];
-            string memory hexColor = toHexString(color.r, color.g, color.b);
+            color = colors[uint8(imgData[i])];
+            hexColor = toHexString(color.r, color.g, color.b);
+
             svgImage = string(abi.encodePacked(
                 svgImage,
-                '<rect x="', uintToStr(cursor.x), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', hexColor, '"/>'
+                '<rect x="',
+                uintToStr(cursor.x),
+                '" y="',
+                uintToStr(cursor.y),
+                '" width="1.5" height="1.5" fill="#',
+                hexColor,
+                '"/>'
             ));
             cursor.x++;
             if (cursor.x >= 32) {
