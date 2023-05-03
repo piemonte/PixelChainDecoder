@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomicfoundation/hardhat-verify");
 const dotenv = require("dotenv");
 
 dotenv.config();
