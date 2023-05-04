@@ -131,45 +131,51 @@ contract PixelChainDecoder is Ownable {
         return colors;
     }
 
+    function pixel4(Cursor memory cursor, string memory color0, string memory color1, string memory color2, string memory color3) internal pure returns (string memory) {
+        return string(abi.encodePacked(
+            '<rect x="', cursor.x, '" y="', cursor.y, '" width="1.5" height="1.5" fill="#', color0, '"/>',
+            '<rect x="', cursor.x + 1, '" y="', cursor.y, '" width="1.5" height="1.5" fill="#', color1, '"/>',                
+            string(abi.encodePacked(
+                '<rect x="', cursor.x + 2, '" y="', cursor.y, '" width="1.5" height="1.5" fill="#', color2, '"/>', 
+                '<rect x="', cursor.x + 3, '" y="', cursor.y, '" width="1.5" height="1.5" fill="#', color3, '"/>'
+            ))
+        ));
+    }
+
+ 
     function generateSvgImage(bytes memory imgData, bytes memory palette)
         public
         pure
         returns (string memory)
     {
-        string memory svgImage = string(abi.encodePacked(
         require((imgData.length % 4) == 0, "PixelChainDecoder: invalid image data");
+        bytes memory svgBytes = abi.encodePacked(
             '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">'
-        ));
+        );
 
         string[16] memory colors = paletteToHexColors(palette);
 
         Cursor memory cursor = Cursor(0, 0);
-        for (uint256 i = 0; i < imgData.length; i++) {
-            svgImage = string(abi.encodePacked(
-                svgImage,
-                '<rect x="',
-                uintToStr(cursor.x),
-                '" y="',
-                uintToStr(cursor.y),
-                '" width="1.5" height="1.5" fill="#',
-                colors[uint8(imgData[i])],
-                '"/>'
-            ));
-            cursor.x++;
+        for (uint256 i = 0; i < (imgData.length / 4); i++) {
+            bytes memory pixelBytes = abi.encodePacked(
+                '<rect x="', uintToStr(cursor.x), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', colors[uint8(imgData[i])], '"/>',
+                '<rect x="', uintToStr(cursor.x + 1), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', colors[uint8(imgData[i + 1])], '"/>',
+                '<rect x="', uintToStr(cursor.x + 2), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', colors[uint8(imgData[i + 2])], '"/>',
+                '<rect x="', uintToStr(cursor.x + 3), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', colors[uint8(imgData[i + 3])], '"/>'
+            );
+            svgBytes = abi.encodePacked(svgBytes, pixelBytes);
+            cursor.x += 4;
             if (cursor.x >= 32) {
                 cursor.x = 0;
                 cursor.y++;
             }
         }
 
-        svgImage = string(abi.encodePacked(
-            svgImage,
-            '</svg>'
-        ));
+        svgBytes = abi.encodePacked(svgBytes, '</svg>');
 
-        return svgImage;
+        return string(svgBytes);
     }
-
+    
 
     function generatePixelChainImage(uint256 tokenId)
         external
