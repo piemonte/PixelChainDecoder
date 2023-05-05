@@ -70,9 +70,13 @@ contract PixelChainDecoder is Ownable {
         uint8 y;
     }
 
+    uint256 constant SVG_DIMENSION = 32;
+    uint256 constant SVG_COLOR_MAX = 16;
+
     IPixelChain public _pxc = IPixelChain(0xbc0E164eE423B7800e355b012c06446e28b1a29d);
 
     function setPixelChainContract(address pxcAddress) public onlyOwner {
+        require(pxcAddress != address(0), "PixelChainDecoder: pxcAddress cannot be a zero address");
         _pxc = IPixelChain(pxcAddress);
     }
 
@@ -105,25 +109,17 @@ contract PixelChainDecoder is Ownable {
 
     function toHexString(uint8 r, uint8 g, uint8 b) internal pure returns (string memory) {
         bytes memory hexString = new bytes(6);
-        hexString[0] = toHexChar(r >> 4);
-        hexString[1] = toHexChar(r & 0x0f);
-        hexString[2] = toHexChar(g >> 4);
-        hexString[3] = toHexChar(g & 0x0f);
-        hexString[4] = toHexChar(b >> 4);
-        hexString[5] = toHexChar(b & 0x0f);
+        hexString[0] = uintToHexDigit(r >> 4);
+        hexString[1] = uintToHexDigit(r & 0x0f);
+        hexString[2] = uintToHexDigit(g >> 4);
+        hexString[3] = uintToHexDigit(g & 0x0f);
+        hexString[4] = uintToHexDigit(b >> 4);
+        hexString[5] = uintToHexDigit(b & 0x0f);
         return string(hexString);
     }
 
-    function toHexChar(uint8 value) internal pure returns (bytes1) {
-        if (value < 10) {
-            return bytes1(uint8(48 + value));
-        } else {
-            return bytes1(uint8(87 + value));
-        }
-    }
-
-    function paletteToHexColors(bytes memory palette) internal pure returns (string[16] memory) {
-        string[16] memory colors;
+    function paletteToHexColors(bytes memory palette) internal pure returns (string[SVG_COLOR_MAX] memory) {
+        string[SVG_COLOR_MAX] memory colors;
         uint256 colorIndex = 0;
 
         for (uint256 i = 0; i < palette.length; i += 3) {
@@ -132,19 +128,22 @@ contract PixelChainDecoder is Ownable {
             uint8 b = uint8(palette[i + 2]);
 
             colors[colorIndex] = toHexString(r, g, b);
-            colorIndex++;
+            if (colorIndex < (SVG_COLOR_MAX - 1)) {
+                colorIndex++;
+            }
         }
 
         return colors;
     }
 
-    function pixel4(Cursor memory cursor, string memory color0, string memory color1, string memory color2, string memory color3) internal pure returns (bytes memory) {
+    function pixel4(Cursor memory cursor, string[4] memory hexColors) internal pure returns (bytes memory) {
+        string memory yStr = uintToStr(cursor.y);
         return abi.encodePacked(
-            '<rect x="', uintToStr(cursor.x), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', color0, '"/>',
-            '<rect x="', uintToStr(cursor.x + 1), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', color1, '"/>',                
+            '<rect x="', uintToStr(cursor.x), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[0], '"/>',
+            '<rect x="', uintToStr(cursor.x + 1), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[1], '"/>',                
             abi.encodePacked(
-                '<rect x="', uintToStr(cursor.x + 2), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', color2, '"/>', 
-                '<rect x="', uintToStr(cursor.x + 3), '" y="', uintToStr(cursor.y), '" width="1.5" height="1.5" fill="#', color3, '"/>'
+                '<rect x="', uintToStr(cursor.x + 2), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[2], '"/>', 
+                '<rect x="', uintToStr(cursor.x + 3), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[3], '"/>'
             )
         );
     }
@@ -157,51 +156,85 @@ contract PixelChainDecoder is Ownable {
     {
         require((imgData.length % 4) == 0, "PixelChainDecoder: invalid image data");
 
-        string[16] memory colors = paletteToHexColors(palette);
+        string[SVG_COLOR_MAX] memory colors = paletteToHexColors(palette);
 
         bytes memory svgBytes = abi.encodePacked(
             '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">'
         );
 
         Cursor memory cursor = Cursor(0, 0);
-        bytes[8] memory pixels;
+        bytes[8] memory svgPixels;
+        string[4] memory hexColors;
 
-        for (uint256 i = 0; i < 16; i++) {
+        for (uint256 i = 0; i < SVG_DIMENSION; i++) {
             uint256 idy = i * 32;
-            pixels[0] = pixel4(cursor, colors[uint8(imgData[idy])], colors[uint8(imgData[idy + 1])], colors[uint8(imgData[idy + 2])], colors[uint8(imgData[idy + 3])]);
+
+            hexColors[0] = colors[uint8(imgData[idy])];
+            hexColors[1] = colors[uint8(imgData[idy + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + 3])];
+            svgPixels[0] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[1] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[1] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[2] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[2] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[3] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[3] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[4] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[4] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[5] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[5] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[6] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[6] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
-            pixels[7] = pixel4(cursor, colors[uint8(imgData[idy + cursor.x])], colors[uint8(imgData[idy + cursor.x + 1])], colors[uint8(imgData[idy + cursor.x + 2])], colors[uint8(imgData[idy + cursor.x + 3])]);
+            hexColors[0] = colors[uint8(imgData[idy + cursor.x])];
+            hexColors[1] = colors[uint8(imgData[idy + cursor.x + 1])];
+            hexColors[2] = colors[uint8(imgData[idy + cursor.x + 2])];
+            hexColors[3] = colors[uint8(imgData[idy + cursor.x + 3])];
+            svgPixels[7] = pixel4(cursor, hexColors);
             cursor.x += 4;
 
             svgBytes = abi.encodePacked(
                 svgBytes,
-                pixels[0],
-                pixels[1],
-                pixels[2],
-                pixels[3],
-                pixels[4],
-                pixels[5],
-                pixels[6],
-                pixels[7]
+                svgPixels[0],
+                svgPixels[1],
+                svgPixels[2],
+                svgPixels[3],
+                svgPixels[4],
+                svgPixels[5],
+                svgPixels[6],
+                svgPixels[7]
             );
 
             if (cursor.x >= 32) {
