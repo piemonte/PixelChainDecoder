@@ -119,6 +119,7 @@ contract PixelChainDecoder is Ownable {
     }
 
     function paletteToHexColors(bytes memory palette) internal pure returns (string[SVG_COLOR_MAX] memory) {
+        require(((palette.length % 3) == 0) && palette.length > 0, "PixelChainDecoder: invalid palette");
         string[SVG_COLOR_MAX] memory colors;
         uint256 colorIndex = 0;
 
@@ -127,9 +128,11 @@ contract PixelChainDecoder is Ownable {
             uint8 g = uint8(palette[i + 1]);
             uint8 b = uint8(palette[i + 2]);
 
-            colors[colorIndex] = toHexString(r, g, b);
-            if (colorIndex < (SVG_COLOR_MAX - 1)) {
+            if (colorIndex < SVG_COLOR_MAX) {
+                colors[colorIndex] = toHexString(r, g, b);
                 colorIndex++;
+            } else {
+                break;
             }
         }
 
@@ -248,7 +251,6 @@ contract PixelChainDecoder is Ownable {
         return string(svgBytes);
     }
     
-
     function generatePixelChainImage(uint256 tokenId)
         external
         view
