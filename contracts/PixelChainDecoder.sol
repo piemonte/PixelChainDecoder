@@ -80,78 +80,6 @@ contract PixelChainDecoder is Ownable {
         _pxc = IPixelChain(pxcAddress);
     }
 
-    function uintToHexDigit(uint256 value) internal pure returns (bytes1) {
-        if (value < 10) {
-            return bytes1(uint8(value) + uint8(bytes1('0')));
-        } else {
-            return bytes1(uint8(value - 10) + uint8(bytes1('a')));
-        }
-    }
-
-    function uintToStr(uint256 value) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0";
-        }
-        uint256 temp = value;
-        uint256 digits;
-        while (temp != 0) {
-            digits++;
-            temp /= 10;
-        }
-        bytes memory buffer = new bytes(digits);
-        while (value != 0) {
-            digits -= 1;
-            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-            value /= 10;
-        }
-        return string(buffer);
-    }
-
-    function toHexString(uint8 r, uint8 g, uint8 b) internal pure returns (string memory) {
-        bytes memory hexString = new bytes(6);
-        hexString[0] = uintToHexDigit(r >> 4);
-        hexString[1] = uintToHexDigit(r & 0x0f);
-        hexString[2] = uintToHexDigit(g >> 4);
-        hexString[3] = uintToHexDigit(g & 0x0f);
-        hexString[4] = uintToHexDigit(b >> 4);
-        hexString[5] = uintToHexDigit(b & 0x0f);
-        return string(hexString);
-    }
-
-    function paletteToHexColors(bytes memory palette) internal pure returns (string[SVG_COLOR_MAX] memory) {
-        require(((palette.length % 3) == 0) && palette.length > 0, "PixelChainDecoder: invalid palette");
-        string[SVG_COLOR_MAX] memory colors;
-        uint256 colorIndex = 0;
-
-        for (uint256 i = 0; i < palette.length; i += 3) {
-            uint8 r = uint8(palette[i]);
-            uint8 g = uint8(palette[i + 1]);
-            uint8 b = uint8(palette[i + 2]);
-
-            if (colorIndex < SVG_COLOR_MAX) {
-                colors[colorIndex] = toHexString(r, g, b);
-                colorIndex++;
-            } else {
-                break;
-            }
-        }
-
-        return colors;
-    }
-
-    function pixel4(Cursor memory cursor, string[4] memory hexColors) internal pure returns (bytes memory) {
-        string memory yStr = uintToStr(cursor.y);
-        return abi.encodePacked(
-            '<rect x="', uintToStr(cursor.x), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[0], '"/>',
-            '<rect x="', uintToStr(cursor.x + 1), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[1], '"/>',                
-            abi.encodePacked(
-                '<rect x="', uintToStr(cursor.x + 2), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[2], '"/>', 
-                '<rect x="', uintToStr(cursor.x + 3), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[3], '"/>'
-            )
-        );
-    }
-
- 
     function generateSvgImage(bytes memory imgData, bytes memory palette)
         public
         pure
@@ -255,11 +183,108 @@ contract PixelChainDecoder is Ownable {
         external
         view
         returns (string memory) {
-        require(tokenId < 2804); // v1 token limit
-        (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
-        PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
-        string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
-        return  svgImage;
+            require(tokenId < 2804); // v1 token limit
+            (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
+            PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
+            string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
+            return  svgImage;
+    }
+
+    // {
+    // 	"token_id":904,
+    // 	"name":"XCOPY 03",
+    // 	"author":{"wallet_address":"0x39Cc9C86E67BAf2129b80Fe3414c397492eA8026"},
+    // 	"image":<?xml></svg>,"version":1,
+    // 	"attributes":[
+    // 		{"trait_type":"Version","value":"PixelChain"},
+    // 		{"trait_type":"Author Wallet","value":"0x39Cc9C86E67BAf2129b80Fe3414c397492eA8026"},
+    // 		{"trait_type":"Author","value":"XCOPY"}
+    // 	],
+    // 	"external_url":"https://pixelchain.art/decoder?id=904&version=1"
+    // }
+    function generatePixelChainMetadata(uint256 tokenId)
+        external
+        view
+        returns (string memory) {
+            require(tokenId < 2804); // v1 token limit
+            (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
+            PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
+            string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
+            // TODO
+        
+            return  svgImage;
+    }
+
+    /* internal functions */
+    function uintToHexDigit(uint256 value) internal pure returns (bytes1) {
+        if (value < 10) {
+            return bytes1(uint8(value) + uint8(bytes1('0')));
+        } else {
+            return bytes1(uint8(value - 10) + uint8(bytes1('a')));
+        }
+    }
+
+    function uintToStr(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
+    }
+
+    function toHexString(uint8 r, uint8 g, uint8 b) internal pure returns (string memory) {
+        bytes memory hexString = new bytes(6);
+        hexString[0] = uintToHexDigit(r >> 4);
+        hexString[1] = uintToHexDigit(r & 0x0f);
+        hexString[2] = uintToHexDigit(g >> 4);
+        hexString[3] = uintToHexDigit(g & 0x0f);
+        hexString[4] = uintToHexDigit(b >> 4);
+        hexString[5] = uintToHexDigit(b & 0x0f);
+        return string(hexString);
+    }
+
+    function paletteToHexColors(bytes memory palette) internal pure returns (string[SVG_COLOR_MAX] memory) {
+        require(((palette.length % 3) == 0) && palette.length > 0, "PixelChainDecoder: invalid palette");
+        string[SVG_COLOR_MAX] memory colors;
+        uint256 colorIndex = 0;
+
+        for (uint256 i = 0; i < palette.length; i += 3) {
+            uint8 r = uint8(palette[i]);
+            uint8 g = uint8(palette[i + 1]);
+            uint8 b = uint8(palette[i + 2]);
+
+            if (colorIndex < SVG_COLOR_MAX) {
+                colors[colorIndex] = toHexString(r, g, b);
+                colorIndex++;
+            } else {
+                break;
+            }
+        }
+
+        return colors;
+    }
+
+    function pixel4(Cursor memory cursor, string[4] memory hexColors) internal pure returns (bytes memory) {
+        string memory yStr = uintToStr(cursor.y);
+        return abi.encodePacked(
+            '<rect x="', uintToStr(cursor.x), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[0], '"/>',
+            '<rect x="', uintToStr(cursor.x + 1), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[1], '"/>',                
+            abi.encodePacked(
+                '<rect x="', uintToStr(cursor.x + 2), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[2], '"/>', 
+                '<rect x="', uintToStr(cursor.x + 3), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[3], '"/>'
+            )
+        );
     }
     
 }
