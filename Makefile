@@ -18,4 +18,8 @@ deploy-goerli:
 	@echo [deploying goerli…]
 	@npx hardhat run scripts/deploy.ts --network goerli
 
+verify-goerli:
+	@echo [verifying goerli…]
+	@npx hardhat verify --network goerli $(arg)
+
 .PHONY: compile test deploy-local deploy-mainnet deploy-goerli

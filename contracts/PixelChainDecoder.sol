@@ -41,7 +41,7 @@ pragma solidity 0.8.18;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
+import 'base64-sol/base64.sol';
 
 interface IPixelChain {
     function pixelChains(uint256 index) external view returns (string memory, bytes memory, bytes memory, address, uint256);
@@ -78,6 +78,17 @@ contract PixelChainDecoder is Ownable {
     function setPixelChainContract(address pxcAddress) public onlyOwner {
         require(pxcAddress != address(0), "PixelChainDecoder: pxcAddress cannot be a zero address");
         _pxc = IPixelChain(pxcAddress);
+    }
+
+    function generatePixelChainImage(uint256 tokenId)
+        external
+        view
+        returns (string memory) {
+            require(tokenId < 2804); // v1 token limit
+            (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
+            PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
+            string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
+            return  svgImage;
     }
 
     function generateSvgImage(bytes memory imgData, bytes memory palette)
@@ -178,23 +189,12 @@ contract PixelChainDecoder is Ownable {
 
         return string(svgBytes);
     }
-    
-    function generatePixelChainImage(uint256 tokenId)
-        external
-        view
-        returns (string memory) {
-            require(tokenId < 2804); // v1 token limit
-            (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
-            PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
-            string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
-            return  svgImage;
-    }
 
     // {
     // 	"token_id":904,
     // 	"name":"XCOPY 03",
     // 	"author":{"wallet_address":"0x39Cc9C86E67BAf2129b80Fe3414c397492eA8026"},
-    // 	"image":<?xml></svg>,"version":1,
+    // 	"image":<svg></svg>,"version":1,
     // 	"attributes":[
     // 		{"trait_type":"Version","value":"PixelChain"},
     // 		{"trait_type":"Author Wallet","value":"0x39Cc9C86E67BAf2129b80Fe3414c397492eA8026"},
@@ -202,17 +202,34 @@ contract PixelChainDecoder is Ownable {
     // 	],
     // 	"external_url":"https://pixelchain.art/decoder?id=904&version=1"
     // }
-    function generatePixelChainMetadata(uint256 tokenId)
-        external
-        view
+    //
+    // authorName: use an empty string for authorName if you don't want to include it in the metadata.
+    // imageData: generated svg image data (ascii encoded)
+    function generateMetadata(string memory tokenId, string memory pixeChainName, string memory authorName, string memory authorWallet, string memory imageData)
+        public
+        pure
         returns (string memory) {
-            require(tokenId < 2804); // v1 token limit
-            (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
-            PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
-            string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
-            // TODO
+        string memory tokenPart = string(abi.encodePacked('{"token_id":', tokenId));
+        string memory namePart = string(abi.encodePacked(', "name":"', pixeChainName, '"'));
+        string memory authorPart = string(abi.encodePacked(', "author":{"wallet_address":"', authorWallet, '"}'));
+        string memory imagePart = string(abi.encodePacked(', "image":"data:image/png;base64,', Base64.encode(bytes(imageData)), '"'));
+        string memory versionPart = ', "version":1';
         
-            return  svgImage;
+        string memory attributesPart;
+        
+        if (bytes(authorName).length > 0) {
+            attributesPart = string(abi.encodePacked(', "attributes":[{"trait_type":"Version", "value":"PixelChain"}, {"trait_type":"Author Wallet", "value":"', authorWallet, '"}, {"trait_type":"Author", "value":"', authorName, '"}]'));
+        } else {
+            attributesPart = string(abi.encodePacked(', "attributes":[{"trait_type":"Version", "value":"PixelChain"}, {"trait_type":"Author Wallet", "value":"', authorWallet, '"}]'));
+        }
+        
+        string memory externalUrlPart = string(abi.encodePacked(', "external_url":"https://pixelchain.art/decoder?id=', tokenId, '&version=1"}'));
+        
+        string memory json = string(abi.encodePacked(tokenPart, namePart, authorPart, imagePart, versionPart, attributesPart, externalUrlPart));
+
+        // if this was a base64 encoded json for tokenURI, it would be:
+        // return string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(json)) ));
+        return json;
     }
 
     /* internal functions */
