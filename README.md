@@ -26,7 +26,7 @@ make compile
 
 | Contract           | Etherscan                                                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| PixelChainDecoder  | [0xdeadbeef](https://etherscan.io/address/0xdeadbeef#code)                                                                 |
+| PixelChainDecoder  | [0x6E5989599301EFF542594bC638C2B8cd5d5d29a1](https://etherscan.io/address/0x6E5989599301EFF542594bC638C2B8cd5d5d29a1#code)                                                                 |
 | PixelChainCore     | [0xbc0E164eE423B7800e355b012c06446e28b1a29d](https://etherscan.io/address/0xbc0E164eE423B7800e355b012c06446e28b1a29d#code) |
 
 ## Resources
