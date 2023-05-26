@@ -91,6 +91,21 @@ contract PixelChainDecoder is Ownable {
             return  svgImage;
     }
 
+    function generatePixelChainTokenURI(uint256 tokenId, string memory authorName)
+        external
+        view
+        returns (string memory) {
+            require(tokenId < 2804); // v1 token limit
+
+            (string memory name, bytes memory data, bytes memory palette, address author, uint256 date) = _pxc.pixelChains(tokenId);
+            PixelChainLibrary.PixelChain memory pxc = PixelChainLibrary.fromPXC(name, data, palette, author, date);
+            
+            string memory svgImage = generateSvgImage(pxc.data, pxc.palette);
+
+            string memory json = generateMetadata(uintToStr(tokenId), pxc.name, authorName, uintToStr(uint256(uint160(pxc.author))), svgImage);
+            return string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(json)) ));
+    }
+
     function generateSvgImage(bytes memory imgData, bytes memory palette)
         public
         pure
