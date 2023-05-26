@@ -101,7 +101,7 @@ contract PixelChainDecoder is Ownable {
         string[SVG_COLOR_MAX] memory colors = paletteToHexColors(palette);
 
         bytes memory svgBytes = abi.encodePacked(
-            '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32">'
+            '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" width="512" height="512">'
         );
 
         Cursor memory cursor = Cursor(0, 0);
@@ -227,8 +227,6 @@ contract PixelChainDecoder is Ownable {
         
         string memory json = string(abi.encodePacked(tokenPart, namePart, authorPart, imagePart, versionPart, attributesPart, externalUrlPart));
 
-        // if this was a base64 encoded json for tokenURI, it would be:
-        // return string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(json)) ));
         return json;
     }
 
@@ -295,11 +293,11 @@ contract PixelChainDecoder is Ownable {
     function pixel4(Cursor memory cursor, string[4] memory hexColors) internal pure returns (bytes memory) {
         string memory yStr = uintToStr(cursor.y);
         return abi.encodePacked(
-            '<rect x="', uintToStr(cursor.x), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[0], '"/>',
-            '<rect x="', uintToStr(cursor.x + 1), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[1], '"/>',                
+            '<rect x="', uintToStr(cursor.x), '" y="', yStr, '" width="1.5" height="1.5" fill="#', hexColors[0], '"/>',
+            '<rect x="', uintToStr(cursor.x + 1), '" y="', yStr, '" width="1.5" height="1.5" fill="#', hexColors[1], '"/>',                
             abi.encodePacked(
-                '<rect x="', uintToStr(cursor.x + 2), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[2], '"/>', 
-                '<rect x="', uintToStr(cursor.x + 3), '" y="', yStr, '" width="1" height="1" fill="#', hexColors[3], '"/>'
+                '<rect x="', uintToStr(cursor.x + 2), '" y="', yStr, '" width="1.5" height="1.5" fill="#', hexColors[2], '"/>', 
+                '<rect x="', uintToStr(cursor.x + 3), '" y="', yStr, '" width="1.5" height="1.5" fill="#', hexColors[3], '"/>'
             )
         );
     }
