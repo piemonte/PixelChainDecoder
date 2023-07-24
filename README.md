@@ -2,7 +2,7 @@
 
 This is an on-chain decoder for the [PixelChain](https://pixelchain.art/) "Classic" collection.
 
-For example, [by reading the contract](https://etherscan.io/address/0x6E5989599301EFF542594bC638C2B8cd5d5d29a1#readContract), enter a token id into the `generatePixelChainImage` function and then paste the result into a text file with an extension ".svg" – you will then have the resulting PixelChain vector image.
+For example, [by reading the contract](https://etherscan.io/address/0xE2d43Ec2516C2446a6DDc95734c9a0eC21B01dC1#readContract), enter a token id into the `generatePixelChainImage` function and then paste the result into a text file with an extension ".svg" – you will then have the resulting PixelChain vector image.
 
 ## What's PixelChain?
 
