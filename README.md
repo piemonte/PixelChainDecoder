@@ -4,6 +4,8 @@ This is an on-chain decoder for the [PixelChain](https://pixelchain.art/) "Class
 
 [By reading the Ethereum contract using Etherscan](https://etherscan.io/address/0xE2d43Ec2516C2446a6DDc95734c9a0eC21B01dC1#readContract), one can enter a PixelChain token id into the `generatePixelChainImage` function. The contract will then generate the resulting SVG image which could be used in services or simply pasted into a text file with the extension ".svg" – you will then have a high resolution PixelChain vector image.
 
+This project's on-chain contract interfaces directly with the original PixelChainCore contract using all the available on-chain data.
+
 ## What's PixelChain?
 
 Pixelchain is a decentralized app that allows anyone to create 32x32 pixelart and store it directly on the Ethereum blockchain, where it will live forever as an ERC-721 token.
