@@ -1,6 +1,6 @@
 # ⛓️ PixelChainDecoder (v1)
 
-This is an on-chain decoder for the [PixelChain](https://pixelchain.art/) "Classic" collection.
+Welcome to the [PixelChainDecoder](https://etherscan.io/address/0xE2d43Ec2516C2446a6DDc95734c9a0eC21B01dC1#code), an on-chain decoder dedicated to rendering the [PixelChain](https://pixelchain.art/) "Classic" collection. This Ethereum smart contract deciphers the on-chain data from the [original PixelChain contract](https://etherscan.io/address/0xbc0E164eE423B7800e355b012c06446e28b1a29d#code) and generates a full-color SVG image directly from the blockchain.
 
 [By reading the Ethereum contract using Etherscan](https://etherscan.io/address/0xE2d43Ec2516C2446a6DDc95734c9a0eC21B01dC1#readContract), one can enter a PixelChain token id into the `generatePixelChainImage` function. The contract will then generate the resulting SVG image which could be used in services or simply pasted into a text file with the extension ".svg" – you will then have a high resolution PixelChain vector image.
 
