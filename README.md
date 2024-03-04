@@ -2,6 +2,10 @@
 
 Welcome to the [PixelChainDecoder](https://etherscan.io/address/0xE2d43Ec2516C2446a6DDc95734c9a0eC21B01dC1#code), an on-chain decoder dedicated to rendering the [PixelChain](https://pixelchain.art/) "Classic" collection. This Ethereum smart contract deciphers the on-chain data from the [original PixelChain contract](https://etherscan.io/address/0xbc0E164eE423B7800e355b012c06446e28b1a29d#code) and generates a full-color SVG image directly from the blockchain.
 
+- [Pixelchain Classic on MagicEden](https://magiceden.io/collections/ethereum/0xbc0e164ee423b7800e355b012c06446e28b1a29d)
+- [Pixelchain Classic History](https://twitter.com/ImsickOk/status/1757374493121491187)
+- [The Doomed DAO and XCOPY 10](https://twitter.com/thedoomedxyz/status/1763578678275969407)
+
 ## Usage
 
 To generate a PixelChain image:
@@ -44,9 +48,6 @@ make compile
 ## Resources
 
 - [PixelChain Website](https://pixelchain.art/)
-- [Pixelchain Classic History](https://twitter.com/ImsickOk/status/1757374493121491187)
-- [Pixelchain Classic on MagicEden](https://magiceden.io/collections/ethereum/0xbc0e164ee423b7800e355b012c06446e28b1a29d)
-- [The Doomed DAO and XCOPY 10](https://twitter.com/thedoomedxyz/status/1763578678275969407)
 - [Off-chain v1 Decoder Website](https://pixelchain.art/decoder?version=1)
 - [Off-chain v1 Decoder Source](https://github.com/PixelChainDapp/PixelChain-GoLang-Decoder)
 - [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)
