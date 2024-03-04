@@ -46,6 +46,7 @@ make compile
 - [PixelChain Website](https://pixelchain.art/)
 - [Pixelchain Classic History](https://twitter.com/ImsickOk/status/1757374493121491187)
 - [Pixelchain Classic on MagicEden](https://magiceden.io/collections/ethereum/0xbc0e164ee423b7800e355b012c06446e28b1a29d)
+- [The Doomed DAO and XCOPY 10](https://twitter.com/thedoomedxyz/status/1763578678275969407)
 - [Off-chain v1 Decoder Website](https://pixelchain.art/decoder?version=1)
 - [Off-chain v1 Decoder Source](https://github.com/PixelChainDapp/PixelChain-GoLang-Decoder)
 - [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)
